@@ -1,0 +1,33 @@
+# Ignore Node modules
+node_modules
+
+# Ignore vendor (it will be installed inside Docker)
+vendor
+
+# Ignore environment files
+.env
+.env.*.backup
+
+# Ignore Git and other config
+.git
+.gitignore
+.gitattributes
+
+# Docker files (prevent copying unnecessary configs)
+.dockerignore
+docker-compose.yml
+
+# Logs and caches
+*.log
+storage/*.key
+storage/framework/*
+storage/logs/*
+bootstrap/cache/*
+
+# OS & IDE junk
+*.DS_Store
+*.swp
+*.swo
+*.idea
+.vscode
+Thumbs.db

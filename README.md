@@ -8,16 +8,14 @@ This is a simple Laravel web application that implements full CRUD (Create, Read
 - View a list of all books.
 - Edit details of existing books.
 - Delete books from the list.
-- (Optional) Search/filter books by title or author.
-- (Optional) Authentication using Laravel Breeze or Jetstream.
+- Search/filter books by title or author.
 
 ## Requirements
 
 - PHP >= 8.x
 - Composer
 - MySQL or PostgreSQL database
-- Laravel 10.x (or your version)
-- Node.js & npm (for frontend assets)
+- Laravel 10.x
 
 ## Installation
 
