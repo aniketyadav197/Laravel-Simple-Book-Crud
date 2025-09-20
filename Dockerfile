@@ -1,42 +1,35 @@
-# Use the official PHP image with Apache
-FROM php:8.2-apache
+FROM php:8.1-apache
 
-# Set working directory
-WORKDIR /var/www/html
-
-# Install system dependencies (including PostgreSQL dev libraries)
+# Install dependencies
 RUN apt-get update && apt-get install -y \
-    git \
-    curl \
-    zip \
-    unzip \
-    libonig-dev \
-    libxml2-dev \
-    libzip-dev \
-    libpq-dev \
-    && docker-php-ext-install pdo pdo_mysql pdo_pgsql zip \
-    && apt-get clean && rm -rf /var/lib/apt/lists/*
+    libzip-dev zip unzip \
+    && docker-php-ext-install zip pdo pdo_mysql
 
 # Enable Apache mod_rewrite
 RUN a2enmod rewrite
 
-# Set Apache DocumentRoot to public
-RUN sed -i 's#/var/www/html#/var/www/html/public#g' /etc/apache2/sites-available/000-default.conf
+# Set working directory inside container
+WORKDIR /var/www/html
 
-# Install Composer
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+# Copy composer.lock and composer.json
+COPY composer.lock composer.json /var/www/html/
 
-# Copy project files
-COPY . .
+# Install composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-# Install Laravel dependencies
+# Install PHP dependencies
 RUN composer install --no-dev --optimize-autoloader
 
-# Set permissions for Laravel storage and cache
+# Copy all application files
+COPY . /var/www/html
+
+# Set correct permissions (storage and bootstrap cache)
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+
+# Set Apache document root to 'public'
+RUN sed -i 's|/var/www/html|/var/www/html/public|g' /etc/apache2/sites-available/000-default.conf
 
 # Expose port 80
 EXPOSE 80
 
-# Start Apache in the foreground
 CMD ["apache2-foreground"]

@@ -2,11 +2,11 @@ version: '3.8'
 
 services:
   app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: laravel-app
+    build: .
     ports:
-      - "8000:80"
-    env_file:
-      - .env
+      - "80:80"
+    volumes:
+      - .:/var/www/html
+    environment:
+      - APACHE_RUN_USER=www-data
+      - APACHE_RUN_GROUP=www-data
