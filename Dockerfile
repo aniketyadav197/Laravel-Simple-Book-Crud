@@ -4,7 +4,7 @@ FROM php:8.2-apache
 # Set working directory
 WORKDIR /var/www/html
 
-# Install system dependencies
+# Install system dependencies including PostgreSQL dev headers
 RUN apt-get update && apt-get install -y \
     git \
     curl \
@@ -13,12 +13,14 @@ RUN apt-get update && apt-get install -y \
     libonig-dev \
     libxml2-dev \
     libzip-dev \
-    && docker-php-ext-install pdo pdo_mysql pdo_pgsql zip
+    libpq-dev \                 
+    && docker-php-ext-install pdo pdo_mysql pdo_pgsql zip \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Enable Apache mod_rewrite
 RUN a2enmod rewrite
 
-# Set Apache DocumentRoot to public
+# Set Apache DocumentRoot to /public (Laravel)
 RUN sed -i 's#/var/www/html#/var/www/html/public#g' /etc/apache2/sites-available/000-default.conf
 
 # Install Composer
@@ -27,7 +29,7 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Copy project files
 COPY . .
 
-# Install Laravel dependencies
+# Install Laravel dependencies (production only)
 RUN composer install --no-dev --optimize-autoloader
 
 # Set permissions for Laravel storage and cache
