@@ -3,7 +3,8 @@ FROM php:8.2-apache
 # Install dependencies
 RUN apt-get update && apt-get install -y \
     libzip-dev zip unzip \
-    && docker-php-ext-install zip pdo pdo_mysql
+    && docker-php-ext-install zip pdo pdo_mysql pdo_pgsql
+
 
 # Enable Apache mod_rewrite
 RUN a2enmod rewrite
