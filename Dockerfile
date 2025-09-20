@@ -11,20 +11,23 @@ RUN a2enmod rewrite
 # Set working directory inside container
 WORKDIR /var/www/html
 
-# Copy composer.lock and composer.json
-COPY composer.lock composer.json /var/www/html/
+# Copy composer files first for caching
+COPY composer.lock composer.json ./
 
 # Install composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 # Install PHP dependencies
-RUN composer install --no-dev --optimize-autoloader
+RUN composer install --no-dev --optimize-autoloader --no-scripts --no-progress
 
-# Copy all application files
-COPY . /var/www/html
+# Copy the rest of the application files
+COPY . .
+
+# Run composer scripts (if any) after full copy
+RUN composer run-script post-autoload-dump || true
 
 # Set correct permissions (storage and bootstrap cache)
-RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+RUN chown -R www-data:www-data storage bootstrap/cache
 
 # Set Apache document root to 'public'
 RUN sed -i 's|/var/www/html|/var/www/html/public|g' /etc/apache2/sites-available/000-default.conf
