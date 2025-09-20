@@ -1,10 +1,10 @@
 FROM php:8.2-apache
 
-# Install dependencies
+# Install dependencies including libpq-dev for PostgreSQL
 RUN apt-get update && apt-get install -y \
-    libzip-dev zip unzip \
-    && docker-php-ext-install zip pdo pdo_mysql pdo_pgsql
-
+    libzip-dev libpq-dev zip unzip \
+    && docker-php-ext-install zip pdo pdo_mysql pdo_pgsql \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Enable Apache mod_rewrite
 RUN a2enmod rewrite
